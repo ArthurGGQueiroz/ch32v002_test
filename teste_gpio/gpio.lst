@@ -1,0 +1,481 @@
+
+gpio.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+00000000 <InterruptVector>:
+	void InterruptVectorDefault()  __attribute__((naked)) __attribute((section(".init"))) __attribute((naked));
+
+	void InterruptVectorDefault( void )
+	{
+		#if !defined(FUNCONF_TINYVECTOR) || !FUNCONF_TINYVECTOR
+			asm volatile( DEFAULT_INTERRUPT_VECTOR_CONTENTS );
+   0:	1500006f          	j	150 <handle_reset>
+   4:	00000000          	.word	0x00000000
+   8:	00000210          	.word	0x00000210
+   c:	000001c4          	.word	0x000001c4
+	...
+  30:	000001c4          	.word	0x000001c4
+  34:	00000000          	.word	0x00000000
+  38:	000001c4          	.word	0x000001c4
+  3c:	00000000          	.word	0x00000000
+  40:	000001c4          	.word	0x000001c4
+  44:	000001c4          	.word	0x000001c4
+  48:	000001c4          	.word	0x000001c4
+  4c:	000001c4          	.word	0x000001c4
+  50:	000001c4          	.word	0x000001c4
+  54:	000001c4          	.word	0x000001c4
+  58:	000001c4          	.word	0x000001c4
+  5c:	000001c4          	.word	0x000001c4
+  60:	000001c4          	.word	0x000001c4
+  64:	000001c4          	.word	0x000001c4
+  68:	000001c4          	.word	0x000001c4
+  6c:	000001c4          	.word	0x000001c4
+  70:	000001c4          	.word	0x000001c4
+  74:	000001c4          	.word	0x000001c4
+  78:	000001c4          	.word	0x000001c4
+  7c:	000001c4          	.word	0x000001c4
+  80:	000001c4          	.word	0x000001c4
+  84:	000001c4          	.word	0x000001c4
+  88:	000001c4          	.word	0x000001c4
+  8c:	000001c4          	.word	0x000001c4
+  90:	000001c4          	.word	0x000001c4
+  94:	000001c4          	.word	0x000001c4
+  98:	000001c4          	.word	0x000001c4
+  9c:	000001c4          	.word	0x000001c4
+  a0:	000001c4          	.word	0x000001c4
+  a4:	0001                	nop
+	...
+
+Disassembly of section .text:
+
+000000a8 <PrintHex>:
+	while( (*DMDATA0) & 0x80 );
+  a8:	e00007b7          	lui	a5,0xe0000
+  ac:	0f478793          	addi	a5,a5,244 # e00000f4 <_eusrstack+0xbffff0f4>
+  b0:	4398                	lw	a4,0(a5)
+  b2:	08077713          	andi	a4,a4,128
+  b6:	ff6d                	bnez	a4,b0 <PrintHex+0x8>
+	*DMDATA0 = 0x78302088; //" 0x"
+  b8:	78302737          	lui	a4,0x78302
+  bc:	08870713          	addi	a4,a4,136 # 78302088 <_eusrstack+0x58301088>
+		while( (*DMDATA0) & 0x80 );
+  c0:	e00006b7          	lui	a3,0xe0000
+	*DMDATA0 = 0x78302088; //" 0x"
+  c4:	c398                	sw	a4,0(a5)
+		while( (*DMDATA0) & 0x80 );
+  c6:	0f468693          	addi	a3,a3,244 # e00000f4 <_eusrstack+0xbffff0f4>
+	for( shift = 28; shift >= 0; shift -= 4 )
+  ca:	4771                	li	a4,28
+		s += ( s < 10 ) ? '0' : ('a' - 10);
+  cc:	45a5                	li	a1,9
+	for( shift = 28; shift >= 0; shift -= 4 )
+  ce:	5671                	li	a2,-4
+		while( (*DMDATA0) & 0x80 );
+  d0:	429c                	lw	a5,0(a3)
+  d2:	0807f793          	andi	a5,a5,128
+  d6:	ffed                	bnez	a5,d0 <PrintHex+0x28>
+		int s = (n>>shift) & 0xf;
+  d8:	00e55333          	srl	t1,a0,a4
+  dc:	00f37313          	andi	t1,t1,15
+		s += ( s < 10 ) ? '0' : ('a' - 10);
+  e0:	0065b7b3          	sltu	a5,a1,t1
+  e4:	40f007b3          	neg	a5,a5
+  e8:	0277f793          	andi	a5,a5,39
+  ec:	03078793          	addi	a5,a5,48
+  f0:	979a                	add	a5,a5,t1
+		*DMDATA0 = 0x85 | (s<<8); //" 0x"
+  f2:	07a2                	slli	a5,a5,0x8
+  f4:	0857e793          	ori	a5,a5,133
+  f8:	c29c                	sw	a5,0(a3)
+	for( shift = 28; shift >= 0; shift -= 4 )
+  fa:	1771                	addi	a4,a4,-4
+  fc:	fcc71ae3          	bne	a4,a2,d0 <PrintHex+0x28>
+}
+ 100:	8082                	ret
+
+00000102 <DelaySysTick>:
+#endif
+
+void DelaySysTick( uint32_t n )
+{
+#if defined(CH32V003) || defined(CH32V00x)
+	uint32_t targend = SysTick->CNT + n;
+ 102:	e000f737          	lui	a4,0xe000f
+ 106:	471c                	lw	a5,8(a4)
+ 108:	953e                	add	a0,a0,a5
+	while( ((int32_t)( SysTick->CNT - targend )) < 0 );
+ 10a:	471c                	lw	a5,8(a4)
+ 10c:	8f89                	sub	a5,a5,a0
+ 10e:	fe07cee3          	bltz	a5,10a <DelaySysTick+0x8>
+	uint64_t targend = SysTick->CNT - n;
+	while( ((int64_t)( SysTick->CNT - targend )) > 0 );
+#else
+	#error DelaySysTick not defined.
+#endif
+}
+ 112:	8082                	ret
+
+00000114 <all>:
+} status;
+
+static void all(int value)
+{
+	for (unsigned i = 0; i < NPINS; i++)
+		funDigitalWrite(pins[i], value);
+ 114:	00451693          	slli	a3,a0,0x4
+ 118:	400115b7          	lui	a1,0x40011
+ 11c:	0106c693          	xori	a3,a3,16
+	for (unsigned i = 0; i < NPINS; i++)
+ 120:	4601                	li	a2,0
+		funDigitalWrite(pins[i], value);
+ 122:	38400513          	li	a0,900
+ 126:	80058593          	addi	a1,a1,-2048 # 40010800 <_eusrstack+0x2000f800>
+ 12a:	4285                	li	t0,1
+	for (unsigned i = 0; i < NPINS; i++)
+ 12c:	4341                	li	t1,16
+		funDigitalWrite(pins[i], value);
+ 12e:	00a607b3          	add	a5,a2,a0
+ 132:	0007c783          	lbu	a5,0(a5)
+	for (unsigned i = 0; i < NPINS; i++)
+ 136:	0605                	addi	a2,a2,1
+		funDigitalWrite(pins[i], value);
+ 138:	0047d713          	srli	a4,a5,0x4
+ 13c:	8bbd                	andi	a5,a5,15
+ 13e:	072a                	slli	a4,a4,0xa
+ 140:	97b6                	add	a5,a5,a3
+ 142:	972e                	add	a4,a4,a1
+ 144:	00f297b3          	sll	a5,t0,a5
+ 148:	cb1c                	sw	a5,16(a4)
+	for (unsigned i = 0; i < NPINS; i++)
+ 14a:	fe6612e3          	bne	a2,t1,12e <all+0x1a>
+}
+ 14e:	8082                	ret
+
+00000150 <handle_reset>:
+	asm volatile( "\n\
+ 150:	20000197          	auipc	gp,0x20000
+ 154:	2ac18193          	addi	gp,gp,684 # 200003fc <__global_pointer$>
+ 158:	20001117          	auipc	sp,0x20001
+ 15c:	ea810113          	addi	sp,sp,-344 # 20001000 <_eusrstack>
+ 160:	6509                	lui	a0,0x2
+ 162:	88050513          	addi	a0,a0,-1920 # 1880 <ch32fun.c.c2292ebd+0x498>
+ 166:	30051073          	csrw	mstatus,a0
+ 16a:	00000697          	auipc	a3,0x0
+ 16e:	e9668693          	addi	a3,a3,-362 # 0 <InterruptVector>
+ 172:	0036e693          	ori	a3,a3,3
+ 176:	30569073          	csrw	mtvec,a3
+asm volatile(
+ 17a:	c0418513          	addi	a0,gp,-1020 # 20000000 <status>
+ 17e:	20000597          	auipc	a1,0x20000
+ 182:	e8e58593          	addi	a1,a1,-370 # 2000000c <_ebss>
+ 186:	4601                	li	a2,0
+ 188:	00b55663          	bge	a0,a1,194 <handle_reset+0x44>
+ 18c:	c110                	sw	a2,0(a0)
+ 18e:	0511                	addi	a0,a0,4
+ 190:	feb54ee3          	blt	a0,a1,18c <handle_reset+0x3c>
+ 194:	39400513          	li	a0,916
+ 198:	c0418593          	addi	a1,gp,-1020 # 20000000 <status>
+ 19c:	c0418613          	addi	a2,gp,-1020 # 20000000 <status>
+ 1a0:	00c58863          	beq	a1,a2,1b0 <handle_reset+0x60>
+ 1a4:	4114                	lw	a3,0(a0)
+ 1a6:	c194                	sw	a3,0(a1)
+ 1a8:	0511                	addi	a0,a0,4
+ 1aa:	0591                	addi	a1,a1,4
+ 1ac:	fec59ae3          	bne	a1,a2,1a0 <handle_reset+0x50>
+	SysTick->CTLR = 1;
+ 1b0:	e000f7b7          	lui	a5,0xe000f
+ 1b4:	4705                	li	a4,1
+ 1b6:	c398                	sw	a4,0(a5)
+asm volatile(
+ 1b8:	27200793          	li	a5,626
+ 1bc:	34179073          	csrw	mepc,a5
+ 1c0:	30200073          	mret
+
+000001c4 <ADC1_2_IRQHandler>:
+
+// Return the Machine Exception Program Register (MEPC)
+static inline uint32_t __get_MEPC(void)
+{
+	uint32_t result;
+	__ASM volatile( ADD_ARCH_ZICSR "csrr %0," "mepc" : "=r"(result));
+ 1c4:	34102573          	csrr	a0,mepc
+	PrintHex( __get_MEPC() ); // "addr2line -e debugprintfdemo.elf 0x000007e6" ---> debugprintfdemo.c:45
+ 1c8:	35c5                	jal	a8 <PrintHex>
+	__ASM volatile( ADD_ARCH_ZICSR "csrr %0, mstatus": "=r"(result) );
+ 1ca:	30002573          	csrr	a0,mstatus
+	PrintHex( __get_MSTATUS() );
+ 1ce:	3de9                	jal	a8 <PrintHex>
+
+// Return the Machine Trap Value Register (MTVAL)
+static inline uint32_t __get_MTVAL(void)
+{
+	uint32_t result;
+	__ASM volatile( ADD_ARCH_ZICSR "csrr %0," "mtval" : "=r" (result) );
+ 1d0:	34302573          	csrr	a0,mtval
+	PrintHex( __get_MTVAL() );
+ 1d4:	3dd1                	jal	a8 <PrintHex>
+	__ASM volatile( ADD_ARCH_ZICSR "csrr %0," "mcause": "=r"(result));
+ 1d6:	34202573          	csrr	a0,mcause
+	PrintHex( __get_MCAUSE() );
+ 1da:	35f9                	jal	a8 <PrintHex>
+	while( (*DMDATA0) & 0x80 );
+ 1dc:	e00007b7          	lui	a5,0xe0000
+ 1e0:	0f478793          	addi	a5,a5,244 # e00000f4 <_eusrstack+0xbffff0f4>
+ 1e4:	4398                	lw	a4,0(a5)
+ 1e6:	08077713          	andi	a4,a4,128
+ 1ea:	ff6d                	bnez	a4,1e4 <ADC1_2_IRQHandler+0x20>
+	*DMDATA0 = 0x0a85;
+ 1ec:	6705                	lui	a4,0x1
+ 1ee:	a8570713          	addi	a4,a4,-1403 # a85 <_data_lma+0x6f1>
+ 1f2:	c398                	sw	a4,0(a5)
+	while( (*DMDATA0) & 0x80 );
+ 1f4:	e00007b7          	lui	a5,0xe0000
+ 1f8:	0f478793          	addi	a5,a5,244 # e00000f4 <_eusrstack+0xbffff0f4>
+ 1fc:	4398                	lw	a4,0(a5)
+ 1fe:	08077713          	andi	a4,a4,128
+ 202:	ff6d                	bnez	a4,1fc <ADC1_2_IRQHandler+0x38>
+	*DMDATA0 = 0xaaaaaa83;
+ 204:	aaaab737          	lui	a4,0xaaaab
+ 208:	a8370713          	addi	a4,a4,-1405 # aaaaaa83 <_eusrstack+0x8aaa9a83>
+ 20c:	c398                	sw	a4,0(a5)
+	asm volatile( "1: j 1b" );
+ 20e:	a001                	j	20e <ADC1_2_IRQHandler+0x4a>
+
+00000210 <NMI_Handler>:
+	RCC->INTR |= RCC_CSSC;	// clear the clock security int flag
+ 210:	40021737          	lui	a4,0x40021
+ 214:	471c                	lw	a5,8(a4)
+ 216:	008006b7          	lui	a3,0x800
+ 21a:	8fd5                	or	a5,a5,a3
+ 21c:	c71c                	sw	a5,8(a4)
+
+0000021e <SystemInit>:
+		FLASH->ACTLR = FLASH_ACTLR_LATENCY_0;               // +0 Cycle Latency
+	#endif
+#elif defined(CH32V00x)
+	// Per TRM
+	#if FUNCONF_SYSTEM_CORE_CLOCK > 25000000
+		FLASH->ACTLR = FLASH_ACTLR_LATENCY_2;
+ 21e:	400227b7          	lui	a5,0x40022
+ 222:	4709                	li	a4,2
+ 224:	c398                	sw	a4,0(a5)
+#elif defined(FUNCONF_USE_HSI) && FUNCONF_USE_HSI
+	#if defined(CH32V30x) || defined(CH32V20x) || defined(CH32L103) || defined(CH32V10x)
+		EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE;
+	#endif
+	#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL
+		RCC->CFGR0 = BASE_CFGR0;
+ 226:	400217b7          	lui	a5,0x40021
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+ 22a:	01080737          	lui	a4,0x1080
+		RCC->CFGR0 = BASE_CFGR0;
+ 22e:	0007a223          	sw	zero,4(a5) # 40021004 <_eusrstack+0x20020004>
+		RCC->CTLR  = BASE_CTLR | RCC_HSION | RCC_PLLON; 			// Use HSI, enable PLL.
+ 232:	08170713          	addi	a4,a4,129 # 1080081 <gpio.c.aed249ec+0x107d8a3>
+ 236:	c398                	sw	a4,0(a5)
+		FLASH->ACTLR = FLASH_ACTLR_LATENCY_0;
+	#endif
+#endif
+
+#ifndef CH5xx
+	RCC->INTR  = 0x009F0000;                               // Clear PLL, CSSC, HSE, HSI and LSI ready flags.
+ 238:	009f0737          	lui	a4,0x9f0
+ 23c:	c798                	sw	a4,8(a5)
+#endif
+
+#if defined(FUNCONF_USE_PLL) && FUNCONF_USE_PLL && !defined(CH5xx)
+	while((RCC->CTLR & RCC_PLLRDY) == 0) {};                       	// Wait till PLL is ready
+ 23e:	4398                	lw	a4,0(a5)
+ 240:	00671693          	slli	a3,a4,0x6
+ 244:	fe06dde3          	bgez	a3,23e <SystemInit+0x20>
+	#if defined(CH32H41x)
+		RCC->PLLCFGR |= RCC_SYSPLL_GATE;
+	#endif
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+ 248:	43d8                	lw	a4,4(a5)
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+ 24a:	400216b7          	lui	a3,0x40021
+	uint32_t tmp32 = RCC->CFGR0 & ~(0x03);							// clr the SW
+ 24e:	9b71                	andi	a4,a4,-4
+	RCC->CFGR0 = tmp32 | RCC_SW_PLL;                       			// Select PLL as system clock source
+ 250:	00276713          	ori	a4,a4,2
+ 254:	c3d8                	sw	a4,4(a5)
+	while ((RCC->CFGR0 & (uint32_t)RCC_SWS) != (uint32_t)0x08); 	// Wait till PLL is used as system clock source
+ 256:	4721                	li	a4,8
+ 258:	42dc                	lw	a5,4(a3)
+ 25a:	8bb1                	andi	a5,a5,12
+ 25c:	fee79ee3          	bne	a5,a4,258 <SystemInit+0x3a>
+	*DMDATA1 = 0x00;
+ 260:	e00007b7          	lui	a5,0xe0000
+ 264:	0e07ac23          	sw	zero,248(a5) # e00000f8 <_eusrstack+0xbffff0f8>
+	*DMDATA0 = 0x80;
+ 268:	08000713          	li	a4,128
+ 26c:	0ee7aa23          	sw	a4,244(a5)
+	SetupDebugPrintf();
+#endif
+#if defined(FUNCONF_SUPPORT_CONSTRUCTORS) && FUNCONF_SUPPORT_CONSTRUCTORS
+	CallConstructors();
+#endif
+}
+ 270:	8082                	ret
+
+00000272 <main>:
+{
+	return (((pin >> 4) + 0xA) << 4) | (pin & 0xF);
+}
+
+int main()
+{
+ 272:	1121                	addi	sp,sp,-24
+ 274:	c626                	sw	s1,12(sp)
+ 276:	ca06                	sw	ra,20(sp)
+ 278:	c822                	sw	s0,16(sp)
+	SystemInit();
+ 27a:	3755                	jal	21e <SystemInit>
+	funGpioInitAll();
+ 27c:	40021737          	lui	a4,0x40021
+ 280:	4f1c                	lw	a5,24(a4)
+
+	for (unsigned i = 0; i < NPINS; i++)
+		funPinMode(pins[i], GPIO_Speed_10MHz | GPIO_CNF_OUT_PP);
+ 282:	400115b7          	lui	a1,0x40011
+	funGpioInitAll();
+ 286:	0357e793          	ori	a5,a5,53
+ 28a:	cf1c                	sw	a5,24(a4)
+	for (unsigned i = 0; i < NPINS; i++)
+ 28c:	4601                	li	a2,0
+		funPinMode(pins[i], GPIO_Speed_10MHz | GPIO_CNF_OUT_PP);
+ 28e:	38400493          	li	s1,900
+ 292:	80058593          	addi	a1,a1,-2048 # 40010800 <_eusrstack+0x2000f800>
+ 296:	42bd                	li	t0,15
+ 298:	4305                	li	t1,1
+	for (unsigned i = 0; i < NPINS; i++)
+ 29a:	4541                	li	a0,16
+		funPinMode(pins[i], GPIO_Speed_10MHz | GPIO_CNF_OUT_PP);
+ 29c:	009607b3          	add	a5,a2,s1
+ 2a0:	0007c783          	lbu	a5,0(a5)
+	for (unsigned i = 0; i < NPINS; i++)
+ 2a4:	0605                	addi	a2,a2,1
+		funPinMode(pins[i], GPIO_Speed_10MHz | GPIO_CNF_OUT_PP);
+ 2a6:	0047d693          	srli	a3,a5,0x4
+ 2aa:	06aa                	slli	a3,a3,0xa
+ 2ac:	96ae                	add	a3,a3,a1
+ 2ae:	8bbd                	andi	a5,a5,15
+ 2b0:	0006a383          	lw	t2,0(a3) # 40021000 <_eusrstack+0x20020000>
+ 2b4:	078a                	slli	a5,a5,0x2
+ 2b6:	00f29733          	sll	a4,t0,a5
+ 2ba:	fff74713          	not	a4,a4
+ 2be:	00777733          	and	a4,a4,t2
+ 2c2:	00f317b3          	sll	a5,t1,a5
+ 2c6:	8fd9                	or	a5,a5,a4
+ 2c8:	c29c                	sw	a5,0(a3)
+	for (unsigned i = 0; i < NPINS; i++)
+ 2ca:	fca619e3          	bne	a2,a0,29c <main+0x2a>
+	all(FUN_LOW);
+ 2ce:	4501                	li	a0,0
+ 2d0:	3591                	jal	114 <all>
+
+	status.magic = 0xC0FFEE03;
+ 2d2:	c0fff7b7          	lui	a5,0xc0fff
+ 2d6:	c0418413          	addi	s0,gp,-1020 # 20000000 <status>
+ 2da:	e0378793          	addi	a5,a5,-509 # c0ffee03 <_eusrstack+0xa0ffde03>
+ 2de:	c01c                	sw	a5,0(s0)
+
+	while (1)
+	{
+		// marcador de início: 2 piscadas rápidas em todos
+		for (int k = 0; k < 2; k++)
+ 2e0:	4709                	li	a4,2
+		{
+			status.pin = 0xFF; all(FUN_HIGH); Delay_Ms(100);
+ 2e2:	0ff00793          	li	a5,255
+ 2e6:	4505                	li	a0,1
+ 2e8:	c03a                	sw	a4,0(sp)
+ 2ea:	c41c                	sw	a5,8(s0)
+ 2ec:	3525                	jal	114 <all>
+ 2ee:	00092537          	lui	a0,0x92
+ 2f2:	7c050513          	addi	a0,a0,1984 # 927c0 <gpio.c.aed249ec+0x8ffe2>
+ 2f6:	3531                	jal	102 <DelaySysTick>
+			status.pin = 0;    all(FUN_LOW);  Delay_Ms(100);
+ 2f8:	4501                	li	a0,0
+ 2fa:	00042423          	sw	zero,8(s0)
+ 2fe:	3d19                	jal	114 <all>
+ 300:	00092537          	lui	a0,0x92
+ 304:	7c050513          	addi	a0,a0,1984 # 927c0 <gpio.c.aed249ec+0x8ffe2>
+ 308:	3bed                	jal	102 <DelaySysTick>
+		for (int k = 0; k < 2; k++)
+ 30a:	4702                	lw	a4,0(sp)
+ 30c:	4785                	li	a5,1
+ 30e:	06f71863          	bne	a4,a5,37e <main+0x10c>
+		}
+		Delay_Ms(400);
+ 312:	0024a537          	lui	a0,0x24a
+ 316:	f0050513          	addi	a0,a0,-256 # 249f00 <gpio.c.aed249ec+0x247722>
+ 31a:	33e5                	jal	102 <DelaySysTick>
+
+		// um pino de cada vez
+		for (unsigned i = 0; i < NPINS; i++)
+ 31c:	4601                	li	a2,0
+		{
+			status.pin = label(pins[i]);
+ 31e:	00c487b3          	add	a5,s1,a2
+ 322:	0007c783          	lbu	a5,0(a5)
+			funDigitalWrite(pins[i], FUN_HIGH);
+			Delay_Ms(500);
+ 326:	002dc537          	lui	a0,0x2dc
+ 32a:	6c050513          	addi	a0,a0,1728 # 2dc6c0 <gpio.c.aed249ec+0x2d9ee2>
+	return (((pin >> 4) + 0xA) << 4) | (pin & 0xF);
+ 32e:	0047d713          	srli	a4,a5,0x4
+ 332:	00a70693          	addi	a3,a4,10 # 4002100a <_eusrstack+0x2002000a>
+ 336:	8bbd                	andi	a5,a5,15
+ 338:	0692                	slli	a3,a3,0x4
+ 33a:	8edd                	or	a3,a3,a5
+			status.pin = label(pins[i]);
+ 33c:	c414                	sw	a3,8(s0)
+			funDigitalWrite(pins[i], FUN_HIGH);
+ 33e:	400116b7          	lui	a3,0x40011
+ 342:	80068693          	addi	a3,a3,-2048 # 40010800 <_eusrstack+0x2000f800>
+ 346:	072a                	slli	a4,a4,0xa
+ 348:	9736                	add	a4,a4,a3
+ 34a:	4685                	li	a3,1
+ 34c:	00f695b3          	sll	a1,a3,a5
+ 350:	cb0c                	sw	a1,16(a4)
+			status.pin = label(pins[i]);
+ 352:	c432                	sw	a2,8(sp)
+			funDigitalWrite(pins[i], FUN_HIGH);
+ 354:	c23e                	sw	a5,4(sp)
+ 356:	c03a                	sw	a4,0(sp)
+			Delay_Ms(500);
+ 358:	336d                	jal	102 <DelaySysTick>
+			funDigitalWrite(pins[i], FUN_LOW);
+ 35a:	4792                	lw	a5,4(sp)
+ 35c:	4702                	lw	a4,0(sp)
+		for (unsigned i = 0; i < NPINS; i++)
+ 35e:	4622                	lw	a2,8(sp)
+			funDigitalWrite(pins[i], FUN_LOW);
+ 360:	07c1                	addi	a5,a5,16
+ 362:	4685                	li	a3,1
+ 364:	00f696b3          	sll	a3,a3,a5
+ 368:	cb14                	sw	a3,16(a4)
+		for (unsigned i = 0; i < NPINS; i++)
+ 36a:	0605                	addi	a2,a2,1
+ 36c:	47c1                	li	a5,16
+ 36e:	faf618e3          	bne	a2,a5,31e <main+0xac>
+		}
+		status.pin = 0;
+ 372:	00042423          	sw	zero,8(s0)
+		status.lap++;
+ 376:	405c                	lw	a5,4(s0)
+ 378:	0785                	addi	a5,a5,1
+ 37a:	c05c                	sw	a5,4(s0)
+		for (int k = 0; k < 2; k++)
+ 37c:	b795                	j	2e0 <main+0x6e>
+ 37e:	873e                	mv	a4,a5
+ 380:	b78d                	j	2e2 <main+0x70>
+	...
+
+00000384 <pins>:
+ 384:	0201 2120 2322 2524 2726 3230 3433 3635     .. !"#$%&'023456
